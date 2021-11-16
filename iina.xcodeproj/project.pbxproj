@@ -3786,7 +3786,7 @@
 					"$(SRCROOT)/deps/lib",
 					"$(PROJECT_DIR)/deps/lib",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 1.2.0;
 				MODULEMAP_FILE = module.modulemap;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
@@ -3831,7 +3831,7 @@
 					"$(SRCROOT)/deps/lib",
 					"$(PROJECT_DIR)/deps/lib",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 1.2.0;
 				MODULEMAP_FILE = module.modulemap;
 				OTHER_CODE_SIGN_FLAGS = "--deep";

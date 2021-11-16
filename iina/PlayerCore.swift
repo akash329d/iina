@@ -110,6 +110,9 @@ class PlayerCore: NSObject {
   var miniPlayer: MiniPlayerWindowController!
 
   var mpv: MPVController!
+  
+  // HDR
+  var hdrMetadata: (primaries: String?, transfer: String?, max_luminance: NSNumber?);
 
   lazy var ffmpegController: FFmpegController = {
     let controller = FFmpegController()
@@ -238,6 +241,31 @@ class PlayerCore: NSObject {
     }
   }
 
+  // HDR
+  private func importFileColorSpace( path: String )
+  {
+    guard let colorspaceData = FFmpegController.getColorSpaceMetadata(forFile: path) else { return }
+
+    var result: (primaries: String?, transfer: String?, max_luminance: NSNumber?)
+    colorspaceData.forEach { (k, v) in
+      guard let key = k as? String else { return }
+      switch key.lowercased() {
+      case "primaries":
+        result.primaries = v as? String
+      case "color-trc":
+        result.transfer = v as? String
+      case "max_luminance":
+        result.max_luminance = v as? NSNumber
+      default:
+        break
+      }
+    }
+    
+    self.hdrMetadata = result
+
+    Logger.log("Received color space metadata for HDR activation: \(result)")
+  }
+
 
   private func openMainWindow(path: String, url: URL, isNetwork: Bool) {
     Logger.log("Opening \(path) in main window", subsystem: subsystem)
@@ -245,6 +273,9 @@ class PlayerCore: NSObject {
     // clear currentFolder since playlist is cleared, so need to auto-load again in playerCore#fileStarted
     info.currentFolder = nil
     info.isNetworkResource = isNetwork
+    
+    // HDR
+    self.importFileColorSpace(path: path)
 
     let isFirstLoad = !mainWindow.loaded
     let _ = mainWindow.window
@@ -1425,7 +1456,7 @@ class PlayerCore: NSObject {
         }
       } else {
         Logger.log("Request new thumbnails", subsystem: subsystem)
-        ffmpegController.generateThumbnail(forFile: url.path)
+        ffmpegController.generateThumbnail(forFile: url.path, thumbWidth:Int32(Preference.integer(for: .thumbnailWidth)))
       }
     }
   }
